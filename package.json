@@ -1,0 +1,23 @@
+{
+  "name": "game_programming",
+  "version": "1.0.0",
+  "description": "repo basé sur le livre hans-on into game programming",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jverhaeghe/game_programming.git"
+  },
+  "author": "jverhaeghe",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/jverhaeghe/game_programming/issues"
+  },
+  "homepage": "https://github.com/jverhaeghe/game_programming#readme",
+  "devDependencies": {
+    "gulp": "^4.0.0",
+    "gulp-server-livereload": "^1.9.2"
+  }
+}
