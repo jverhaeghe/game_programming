@@ -14,6 +14,7 @@
 
     const PADDLE_HEIGHT = 100;
     const PADDLE_WIDTH = 10;
+    const MAX_POINT = 3;
 
     var canvas;
     var canvasContext;
@@ -23,6 +24,9 @@
     var paddle1Y , paddle2Y = 200 ;
     var PScore1 = PScore2 = 0 ;
 
+    var backColor = 'white', tonicColor = 'orange';
+
+
 
     window.onload = function(){
         
@@ -31,9 +35,7 @@
 
         canvas.addEventListener('mousemove', function(evt){
             var mousePos = calculateMousePos(evt);
-            paddle1Y = mousePos.y - (PADDLE_HEIGHT / 2 )
-            paddle2Y = mousePos.y - (PADDLE_HEIGHT / 2 )
-        
+            paddle1Y = mousePos.y - (PADDLE_HEIGHT / 2 );
         });
 
         setInterval(function()
@@ -45,7 +47,6 @@
 
     function calculateMousePos(evt){
         var rect = canvas.getBoundingClientRect(), root = document.documentElement;
-
         var mouseX = evt.clientX - rect.left - root.scrollLeft;
         var mouseY = evt.clientY - rect.top - root.scrollTop;
 
@@ -55,8 +56,33 @@
         }
     }
 
+    function revert(paddleY)
+    {
+        // effet mirroir
+        ballSpeedX = -ballSpeedX;
+        
+        // calcul de l'angle de renvoit
+        var deltaY = ballY -(paddleY+PADDLE_HEIGHT/2);
+			
+        console.log(deltaY);
+        ballSpeedY = deltaY * 0.35;
+    }
+
+    function aiMove()
+    {
+        // recuperer le centre de la raquette
+        var paddleCenter = paddle2Y + PADDLE_HEIGHT / 2;
+        if(paddleCenter < ballY - 35){
+            paddle2Y += 5;
+        }else if(paddleCenter > ballY + 35){
+            paddle2Y -= 5;
+        }
+    }
     function moveEverything()
     {
+
+        aiMove();
+
         ballY = ballY + ballSpeedY;
         ballX = ballX + ballSpeedX;
         if(ballY >= canvas.height || ballY <= 0 ){
@@ -67,24 +93,22 @@
         if( ballX <=  20 ){
            
             if(ballY > paddle1Y && ballY < paddle1Y + PADDLE_HEIGHT){
-                ballSpeedX  *= -1;
+                revert(paddle1Y );
             }else{
                 PScore2++;
                 ballReset();                               
             }
-
-            
         }
 
         if ( ballX >= canvas.width - 20)
         {
             if(
                 ballY > paddle2Y && ballY < paddle2Y + PADDLE_HEIGHT
-             ){
-                ballSpeedX  *= -1;
+             ){ 
+                revert(paddle2Y );
             }else{
                 PScore1++;
-                ballReset();  
+                ballReset();          
             }
         }
 
@@ -94,26 +118,38 @@
 
     function ballReset()
     {
-        ballX = canvas.width / 2;
-        ballY = canvas.height / 2;
+
+        if(PScore1 >= MAX_POINT || PScore1 >= MAX_POINT ){
+            drawFinalScreen();
+        }
+        ballSpeedX = -ballSpeedX;
+        ballX = canvas.width/2;
+        ballY = canvas.height/2;
     }
 
     function drawEverything()
     {
         // dessine le canvas
-        colorRect(0,0,canvas.width, canvas.height , 'black')
+        colorRect(0,0,canvas.width, canvas.height , backColor)
         // dessine le paddle 1 
-        colorRect(0,paddle1Y,PADDLE_WIDTH,100 , 'red')
+        colorRect(0,paddle1Y,PADDLE_WIDTH,100 , tonicColor)
         // dessine le paddle 2 
-        colorRect(canvas.width - PADDLE_WIDTH, paddle2Y, PADDLE_WIDTH ,100 , 'yellow')
+        colorRect(canvas.width - PADDLE_WIDTH, paddle2Y, PADDLE_WIDTH ,100 , tonicColor)
         // dessine la ball 
-        colorCirc(ballX,ballY,Math.PI*2, 'orange');
+        colorCirc(ballX,ballY,Math.PI*2, tonicColor);
 
         canvasContext.font = "30px Arial";
         canvasContext.fillText(PScore1, 10, 50);
          
         canvasContext.fillText(PScore2,  canvas.width - 100 , 50);
 
+        drawNet();
+    }
+
+    function drawNet() {
+        for(var i=0;i<canvas.height;i+=40) {
+            colorRect(canvas.width/2-1,i,2,20,tonicColor);
+        }
     }
 
     function colorRect(topLeftX, topLeftY, width, height, color)
