@@ -23,10 +23,10 @@
     
     var paddle1Y , paddle2Y = 200 ;
     var PScore1 = PScore2 = 0 ;
+    var staticMode = endGameMode = false;
+
 
     var backColor = 'white', tonicColor = 'orange';
-
-
 
     window.onload = function(){
         
@@ -38,11 +38,27 @@
             paddle1Y = mousePos.y - (PADDLE_HEIGHT / 2 );
         });
 
+        canvas.addEventListener('mousedown', handleMouseClick);
+
         setInterval(function()
         {
             moveEverything();
             drawEverything();
         }, 1000 / fps);
+    }
+
+    function handleMouseClick(evt) {
+        alert('handle CLick');
+
+        if(endGameMode){
+            PScore1 = PScore2  = 0;
+            endGameMode = false;
+        }
+        if(staticMode) {
+            staticMode = false;
+        }
+
+        
     }
 
     function calculateMousePos(evt){
@@ -64,7 +80,6 @@
         // calcul de l'angle de renvoit
         var deltaY = ballY -(paddleY+PADDLE_HEIGHT/2);
 			
-        console.log(deltaY);
         ballSpeedY = deltaY * 0.35;
     }
 
@@ -80,6 +95,11 @@
     }
     function moveEverything()
     {
+
+        // si l'on est en en fin de jeu
+        if(staticMode){           
+		    return;
+        }
 
         aiMove();
 
@@ -111,24 +131,36 @@
                 ballReset();          
             }
         }
-
-      
-      
     }
 
     function ballReset()
     {
 
-        if(PScore1 >= MAX_POINT || PScore1 >= MAX_POINT ){
+        if(PScore1 == MAX_POINT || PScore2 == MAX_POINT ){
             drawFinalScreen();
         }
+
         ballSpeedX = -ballSpeedX;
         ballX = canvas.width/2;
         ballY = canvas.height/2;
     }
+    
+    function drawFinalScreen()
+    {
+        endGameMode = true,
+        staticMode = true;
+
+        canvasContext.fillText('fin du jeu', 30, 70);
+        canvasContext.fillText('cliquer sur l\'ecran pour recommencer', 30, 12 0);
+    }
 
     function drawEverything()
     {
+        if(staticMode){
+            canvasContext.fillStyle = 'white';
+		    canvasContext.fillText("click to continue", 350, 500);
+		    return;
+        }
         // dessine le canvas
         colorRect(0,0,canvas.width, canvas.height , backColor)
         // dessine le paddle 1 
